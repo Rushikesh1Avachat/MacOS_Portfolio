@@ -1,6 +1,7 @@
-import React, {useRef} from 'react'
-import  gsap from "gsap";
-import {useGSAP} from "@gsap/react";
+import React, { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
 const renderText = (text, className, fontFamily, baseWeight = 400) => {
     return [...text].map((char, i) => (
         <span
@@ -12,10 +13,12 @@ const renderText = (text, className, fontFamily, baseWeight = 400) => {
     </span>
     ));
 };
+
 const FONT_WEIGHTS = {
     subtitle: { min: 100, max: 400, default: 100 },
     title: { min: 400, max: 900, default: 400 },
 };
+
 const setUpTextHover = (container, type) => {
     if (!container) return;
 
@@ -31,18 +34,18 @@ const setUpTextHover = (container, type) => {
     };
 
     const handleMouseMove = (e) => {
-        const { left } = container.getBoundingClientRect();
-        const mouseX = e.clientX - left;
+        const rect = container.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
 
         letters.forEach((letter) => {
             const { left: l, width: w } = letter.getBoundingClientRect();
-            const center = l - left + w / 2;
+            const center = l - rect.left + w / 2;
             const distance = Math.abs(mouseX - center);
 
-            // Gaussian falloff — same effect as the video
+            // Smooth Gaussian effect
             const intensity = Math.exp(-(distance ** 2) / 20000);
-
             const weight = min + (max - min) * intensity;
+
             animateLetter(letter, weight);
         });
     };
@@ -53,36 +56,41 @@ const setUpTextHover = (container, type) => {
 
     container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseleave", resetWeights);
-    return()=>{
-        container.removeEventListener("mousemove," ,handleMouseMove)
-        container.removeEventListener("mouseleave," ,resetWeights)
-    }
+
+    return () => {
+        container.removeEventListener("mousemove", handleMouseMove);
+        container.removeEventListener("mouseleave", resetWeights);
+    };
 };
 
 const Welcome = () => {
-    const titleRef=useRef(null)
-    const subtitleRef=useRef(null)
-    useGSAP(()=>{
-    const subtitleCleanUp=   setUpTextHover(subtitleRef.current, 'subtitle')
-        const titleCleanUp=    setUpTextHover(titleRef.current , 'title')
+    const titleRef = useRef(null);
+    const subtitleRef = useRef(null);
 
-        return ()=>{
-       subtitleCleanUp()
-            titleCleanUp()
-        }
-    },[])
+    useGSAP(() => {
+        const subtitleCleanup = setUpTextHover(subtitleRef.current, "subtitle");
+        const titleCleanup = setUpTextHover(titleRef.current, "title");
+
+        return () => {
+            subtitleCleanup();
+            titleCleanup();
+        };
+    }, []);
+
     return (
         <section id="welcome">
-            <p ref={subtitleRef}>
-                {renderText(`Hey 👋, I'm Rushikesh Avachat `, `text-3xl`, `font-georama`, 100)}
+            <p ref={subtitleRef} >
+                 {renderText("Hey,I'm Rushikesh Welcome to my ", "text-4xl", "font-georama", 100)}
             </p>
-
-            <h1 ref={titleRef} className=" mt-7">
-                { renderText(" Portfolio", " text-9xl italic font-georama ")}</h1>
+            <h1 ref={titleRef} className="mt-7 ">
+                {renderText("portfolio", "text-7xl italic", "font-georama")}
+            </h1>
             <div className="small-screen">
-                <p> This Portfolio is designed for Desktop/Tablet Screens only.</p>
+                <p>This Portfolio is designed for Desktop/Tablet Screens only.</p>
             </div>
         </section>
-    )
-}
-export default Welcome
+    );
+};
+
+export default Welcome;
+
